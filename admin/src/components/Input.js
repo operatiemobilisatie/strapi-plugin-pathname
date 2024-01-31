@@ -1,10 +1,10 @@
 import * as React from "react";
 import { get } from 'lodash';
 import { useIntl } from "react-intl";
-import { Field, FieldLabel, FieldInput, Flex, Typography, lightTheme } from '@strapi/design-system';
+import { Field, FieldLabel, FieldHint, FieldError, FieldInput, Flex, Typography, lightTheme } from '@strapi/design-system';
 import { useCMEditViewDataManager } from '@strapi/helper-plugin';
 
-const popSlug = (path) => {
+const popSlugFromPath = (path) => {
   if(path) {
     let pathArray = path.split('/');
     pathArray.pop();
@@ -19,23 +19,28 @@ const Input = React.forwardRef((props, ref) => {
     props; // these are just some of the props passed by the content-manager
 
   const { formatMessage } = useIntl();
+
+  // Get slug value
   const { modifiedData } = useCMEditViewDataManager();
   const slug = get(modifiedData, 'slug', null);
 
-  const [path, setPath] = React.useState(popSlug(value));
+  // Set initial field state
+  const [path, setPath] = React.useState(popSlugFromPath(value));
 
   const handleChange = (e) => {
     setPath(e.currentTarget.value);
   };
 
   React.useEffect(() => {
-    
+    // Replace remove trailing slash    
     let valueToSave
     if(path) valueToSave = path.replace(/\/$/, "") + '/' + slug;
     else valueToSave = slug;
 
+    // Add leading slash
     if(valueToSave.indexOf('/') !== 0) valueToSave = '/' + valueToSave
 
+    // Set new final value
     onChange({
       target: { name, type: attribute.type, value: valueToSave },
     });
@@ -46,6 +51,7 @@ const Input = React.forwardRef((props, ref) => {
     <Field
       name={name}
       id={name}
+      hint="Enter the full path to the page excluding the slug."
       // GenericInput calls formatMessage and returns a string for the error
       required={required}
     >
@@ -55,6 +61,8 @@ const Input = React.forwardRef((props, ref) => {
           <FieldInput placeholder="/some/parent/path" value={path} type="text" onChange={handleChange}/>
           <Typography style={fixedInputTextStyle}>/{slug}</Typography>
         </Flex>
+        <FieldHint />
+        <FieldError />
       </Flex>
     </Field>
   );
