@@ -38,7 +38,7 @@ const Input = React.forwardRef((props, ref) => {
     else valueToSave = slug;
 
     // Add leading slash
-    if(valueToSave.indexOf('/') !== 0) valueToSave = '/' + valueToSave
+    if(valueToSave && valueToSave.indexOf('/') !== 0) valueToSave = '/' + valueToSave
 
     // Set new final value
     onChange({
